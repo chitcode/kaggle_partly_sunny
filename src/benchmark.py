@@ -50,15 +50,19 @@ def main():
     
     vec_y_binary = np.vectorize(y_binary)
     
+    final_cv_error = 0
+    
     for i in train.columns[4:]:
         y = train[i]
         y = vec_y_binary(y)
         cv_score = np.mean(cross_validation.cross_val_score(lr, X_train, y, cv=20, scoring='mean_squared_error'))
-        print "20 Fold CV Score for: ",y, cv_score
+        print "20 Fold CV Score for: ",i, cv_score
+        final_cv_error += np.abs(cv_score)
         
         lr.fit( X_train, y)
         pred[i] = lr.predict_proba(X_test)[:,1]
         
+    print 'Final Mean Squared Error for CV ',np.sqrt(final_cv_error/24)
     pred.to_csv('benchmark.csv')
     print 'submission file created'
 
